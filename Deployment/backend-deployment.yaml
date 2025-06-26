@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: videoclub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-videoclub
+  template:
+    metadata:
+      labels:
+        app: backend-videoclub
+    spec:
+      containers:
+      - name: backend-videoclub
+        image: manosmorf97/backend-videoclub:latest
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+      - name: docker-credentials

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-stateful
+  namespace: videoclub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      sqlDb: mysql-stateful
+  template:
+    metadata:
+      labels:
+        sqlDb: mysql-stateful
+    spec:
+      containers:
+      - name: mysql-db
+        image: mysql
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: sql-credentials
+              key: USER
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sql-credentials
+              key: PASSWORD
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sql-credentials
+              key: PASSWORD
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: sql-credentials
+              key: DB
+        - name: MYSQLD_OPTS
+          value: "--bind-address=0.0.0.0"
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: var/lib/mysql
+      volumes:
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: mysql-pvc
